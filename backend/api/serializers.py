@@ -1,5 +1,5 @@
+from django.contrib.auth.hashers import make_password
 from django.shortcuts import get_object_or_404
-from drf_extra_fields.fields import Base64ImageField
 from rest_framework.serializers import (
     CharField,
     IntegerField,
@@ -9,8 +9,8 @@ from rest_framework.serializers import (
     SlugRelatedField,
     ValidationError
 )
-
-from foodgram.constants import COOKING_TIME_MIN_VALUE, INGREDIENT_MIN_AMOUNT
+from drf_extra_fields.fields import Base64ImageField
+from users.models import User, ShoppingCart
 from recipes.models import (
     COOKING_TIME_MIN_ERROR,
     CountOfIngredient,
@@ -18,8 +18,52 @@ from recipes.models import (
     Recipe,
     Tag
 )
-from users.models import ShoppingCart
-from users.serializers import UserSerializer
+from .constants import COOKING_TIME_MIN_VALUE, INGREDIENT_MIN_AMOUNT
+
+
+class RecipeShortReadSerializer(ModelSerializer):
+    class Meta:
+        model = Recipe
+        fields = ('id', 'name', 'image', 'cooking_time',)
+
+
+class UserSerializer(ModelSerializer):
+    is_subscribed = SerializerMethodField('is_subscribed_user')
+
+    class Meta:
+        model = User
+        fields = (
+            'id', 'email', 'username', 'first_name', 'last_name', 'password',
+            'is_subscribed',
+        )
+        extra_kwargs = {
+            'password': {'write_only': True, 'required': True},
+        }
+
+    def is_subscribed_user(self, obj):
+        user = self.context['request'].user
+        return (
+            user.is_authenticated
+            and obj.subscribing.filter(user=user).exists()
+        )
+
+    def create(self, validated_data):
+        validated_data['password'] = (
+            make_password(validated_data.pop('password'))
+        )
+        return super().create(validated_data)
+
+
+class SubscriptionSerializer(UserSerializer):
+    recipes = RecipeShortReadSerializer(many=True)
+    recipes_count = SerializerMethodField()
+
+    class Meta(UserSerializer.Meta):
+        fields = UserSerializer.Meta.fields + ('recipes', 'recipes_count',)
+
+    def get_recipes_count(self, obj):
+        return obj.recipes.count()
+
 
 TAGS_UNIQUE_ERROR = 'Теги не могут повторяться!'
 TAGS_EMPTY_ERROR = 'Рецепт не может быть без тегов!'
@@ -132,17 +176,21 @@ class RecipeWriteSerializer(ModelSerializer):
             }
         }
 
-    def validate(self, attrs):
-        if attrs['cooking_time'] < COOKING_TIME_MIN_VALUE:
+    def validate_cooking_time(self, value):
+        if value < COOKING_TIME_MIN_VALUE:
             raise ValidationError(COOKING_TIME_MIN_ERROR)
-        if len(attrs['tags']) == 0:
+
+    def validate_tags(self, value):
+        if len(value) == 0:
             raise ValidationError(TAGS_EMPTY_ERROR)
-        if len(attrs['tags']) > len(set(attrs['tags'])):
+        if len(value) != len(set(value)):
             raise ValidationError(TAGS_UNIQUE_ERROR)
-        if len(attrs['ingredients']) == 0:
+
+    def validate_ingredients(self, value):
+        if len(value) == 0:
             raise ValidationError(INGREDIENTS_EMPTY_ERROR)
         id_ingredients = []
-        for ingredient in attrs['ingredients']:
+        for ingredient in value:
             if ingredient['amount'] < INGREDIENT_MIN_AMOUNT:
                 raise ValidationError(
                     INGREDIENT_MIN_AMOUNT_ERROR.format(
@@ -152,18 +200,17 @@ class RecipeWriteSerializer(ModelSerializer):
             id_ingredients.append(ingredient['id'])
         if len(id_ingredients) > len(set(id_ingredients)):
             raise ValidationError(INGREDIENTS_UNIQUE_ERROR)
-        return attrs
+        return value
 
     def add_ingredients_and_tags(self, instance, validated_data):
-        ingredients, tags = (
-            validated_data.pop('ingredients'), validated_data.pop('tags')
-        )
+        ingredients = validated_data.pop('ingredients')
         for ingredient in ingredients:
             count_of_ingredient, _ = CountOfIngredient.objects.get_or_create(
                 ingredient=get_object_or_404(Ingredient, pk=ingredient['id']),
                 amount=ingredient['amount'],
             )
             instance.ingredients.add(count_of_ingredient)
+        tags = validated_data.pop('tags')
         for tag in tags:
             instance.tags.add(tag)
         return instance

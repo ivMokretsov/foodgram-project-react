@@ -2,7 +2,7 @@ from django.contrib.admin import ModelAdmin, display, register
 from django.contrib.auth.admin import UserAdmin
 from django.db.models import Count, Sum
 
-from foodgram.constants import EMPTY
+from api.constants import EMPTY
 from .forms import CustomUserChangeForm, CustomUserCreationForm
 from .models import ShoppingCart, Subscribe, User
 

@@ -2,7 +2,7 @@ from django.urls import include, path
 from djoser.views import TokenDestroyView
 from rest_framework.routers import DefaultRouter
 
-from .views import (
+from api.views import (
     ShoppingCartViewSet,
     TokenCreateWithCheckBlockStatusView,
     UserSubscribeViewSet
@@ -10,7 +10,9 @@ from .views import (
 
 router = DefaultRouter()
 router.register(r'users', UserSubscribeViewSet, basename='users')
-router.register(r'recipes', ShoppingCartViewSet, basename='shopping_cart')
+router.register(
+    r'shopping_cart', ShoppingCartViewSet, basename='shopping_cart'
+)
 
 app_name = 'users'
 

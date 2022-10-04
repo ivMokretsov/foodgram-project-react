@@ -15,7 +15,7 @@ from django.db.models import (
 )
 from django.urls import reverse
 
-from foodgram.constants import COOKING_TIME_MIN_VALUE, INGREDIENT_MIN_AMOUNT
+from api.constants import COOKING_TIME_MIN_VALUE, INGREDIENT_MIN_AMOUNT
 
 User = get_user_model()
 
@@ -61,6 +61,7 @@ class Recipe(Model):
     text = TextField('Описание')
     ingredients = ManyToManyField(
         'CountOfIngredient',
+        through='Recipe_CountOfIngredient',
         related_name='recipes',
         verbose_name='Ингредиенты'
     )
@@ -129,6 +130,11 @@ class CountOfIngredient(Model):
             f'{self.ingredient.name} - {self.amount}'
             f' ({self.ingredient.measurement_unit})'
         )
+
+
+class Recipe_CountOfIngredient(Model):
+    recipe = ForeignKey(Recipe, on_delete=CASCADE)
+    count_of_ingredient = ForeignKey(CountOfIngredient, on_delete=CASCADE)
 
 
 class Favorite(Model):
