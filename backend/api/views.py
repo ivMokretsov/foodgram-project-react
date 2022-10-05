@@ -276,7 +276,7 @@ class ShoppingCartViewSet(GenericViewSet):
         response['Content-Disposition'] = f'attachment; filename={FILE_NAME}'
         return response
 
-    def add_to_shopping_cart(self, request, recipe, shopping_cart):
+    def add_to_shopping_cart(self, recipe, shopping_cart):
         if shopping_cart.recipes.filter(pk__in=(recipe.pk,)).exists():
             return Response(
                 {ERRORS_KEY: SHOPPING_CART_RECIPE_CANNOT_ADDED_TWICE},
@@ -289,7 +289,7 @@ class ShoppingCartViewSet(GenericViewSet):
             status=HTTP_201_CREATED,
         )
 
-    def remove_from_shopping_cart(self, request, recipe, shopping_cart):
+    def remove_from_shopping_cart(self, recipe, shopping_cart):
         if not shopping_cart.recipes.filter(pk__in=(recipe.pk,)).exists():
             return Response(
                 {ERRORS_KEY: SHOPPING_CART_RECIPE_CANNOT_DELETE},

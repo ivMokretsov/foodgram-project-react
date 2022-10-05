@@ -179,12 +179,14 @@ class RecipeWriteSerializer(ModelSerializer):
     def validate_cooking_time(self, value):
         if value < COOKING_TIME_MIN_VALUE:
             raise ValidationError(COOKING_TIME_MIN_ERROR)
+        return value
 
     def validate_tags(self, value):
         if len(value) == 0:
             raise ValidationError(TAGS_EMPTY_ERROR)
         if len(value) != len(set(value)):
             raise ValidationError(TAGS_UNIQUE_ERROR)
+        return value
 
     def validate_ingredients(self, value):
         if len(value) == 0:
@@ -211,9 +213,7 @@ class RecipeWriteSerializer(ModelSerializer):
             )
             instance.ingredients.add(count_of_ingredient)
         tags = validated_data.pop('tags')
-        for tag in tags:
-            instance.tags.add(tag)
-        return instance
+        instance.tags.set(tags)
 
     def create(self, validated_data):
         saved = {}

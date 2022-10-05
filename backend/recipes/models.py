@@ -60,8 +60,8 @@ class Recipe(Model):
     name = CharField('Название', max_length=200)
     text = TextField('Описание')
     ingredients = ManyToManyField(
-        'CountOfIngredient',
-        through='Recipe_CountOfIngredient',
+        Ingredient,
+        through='CountOfIngredient',
         related_name='recipes',
         verbose_name='Ингредиенты'
     )
@@ -105,6 +105,13 @@ class CountOfIngredient(Model):
         related_name='count_in_recipes',
         verbose_name='Ингредиент',
     )
+
+    recipe = ForeignKey(
+        Recipe,
+        on_delete=CASCADE,
+        verbose_name='Рецепт'
+    )
+
     amount = PositiveIntegerField(
         'Количество',
         validators=(MinValueValidator(
@@ -130,11 +137,6 @@ class CountOfIngredient(Model):
             f'{self.ingredient.name} - {self.amount}'
             f' ({self.ingredient.measurement_unit})'
         )
-
-
-class Recipe_CountOfIngredient(Model):
-    recipe = ForeignKey(Recipe, on_delete=CASCADE)
-    count_of_ingredient = ForeignKey(CountOfIngredient, on_delete=CASCADE)
 
 
 class Favorite(Model):
