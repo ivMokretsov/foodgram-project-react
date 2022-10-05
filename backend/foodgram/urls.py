@@ -3,11 +3,8 @@ from django.urls import path
 from django.urls.conf import include
 
 from foodgram.settings import DEBUG
+from api.urls import api
 
-api = [
-    path('', include('users.urls', namespace='users')),
-    path('', include('recipes.urls', namespace='recipes')),
-]
 
 urlpatterns = [
     path('admin/', admin.site.urls),

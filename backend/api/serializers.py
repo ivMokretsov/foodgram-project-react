@@ -213,8 +213,8 @@ class RecipeWriteSerializer(ModelSerializer):
             )
             for ingredient in ingredients
         ]
-        count_of_ingredient = CountOfIngredient.objects.bulk_create(objects)
-        instance.ingredients.add(count_of_ingredient)
+        CountOfIngredient.objects.bulk_create(objects)
+
         tags = validated_data.pop('tags')
         instance.tags.set(tags)
 

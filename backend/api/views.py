@@ -307,5 +307,5 @@ class ShoppingCartViewSet(GenericViewSet):
             ShoppingCart.objects.get_or_create(user=request.user)[0]
         )
         if request.method == 'GET':
-            return self.add_to_shopping_cart(request, recipe, shopping_cart)
-        return self.remove_from_shopping_cart(request, recipe, shopping_cart)
+            return self.add_to_shopping_cart(recipe, shopping_cart)
+        return self.remove_from_shopping_cart(recipe, shopping_cart)
