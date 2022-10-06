@@ -15,6 +15,11 @@ ALLOWED_HOSTS = ["*"]
 
 INTERNAL_IPS = ['127.0.0.1']
 
+CSRF_TRUSTED_ORIGINS = [
+    "http://51.250.66.225/",
+    "http://localhost",
+]
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',

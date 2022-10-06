@@ -218,6 +218,8 @@ class RecipeWriteSerializer(ModelSerializer):
         tags = validated_data.pop('tags')
         instance.tags.set(tags)
 
+        return instance
+
     def create(self, validated_data):
         saved = {}
         saved['ingredients'] = validated_data.pop('ingredients')
