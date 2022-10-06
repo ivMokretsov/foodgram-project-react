@@ -48,7 +48,7 @@ jobs:
         with:
           context: ./backend/
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/backend:1
+          tags: ${{ secrets.DOCKER_USERNAME }}/backend:latest
 
   build_frontend_and_push_to_docker_hub:
       name: Build frontend and push Docker image to Docker Hub
@@ -74,7 +74,7 @@ jobs:
           with:
             context: ./frontend/
             push: true
-            tags: ${{ secrets.DOCKER_USERNAME }}/frontend:1
+            tags: ${{ secrets.DOCKER_USERNAME }}/frontend:latest
 
   deploy:
     name: Deploy image on production server
@@ -91,8 +91,8 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             cd ~/foodgram-project-react/infra
-            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/frontend:1
-            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/backend:1
+            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/frontend:latest
+            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/backend:latest
             sudo docker-compose stop
             sudo docker-compose rm -f backend frontend
             touch .env
