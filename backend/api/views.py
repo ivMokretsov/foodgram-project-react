@@ -188,8 +188,8 @@ class UserSubscribeViewSet(UserViewSet):
                 status=HTTP_400_BAD_REQUEST,
             )
         subscribe = Subscribe.objects.filter(
-                user=request.user,
-                author=author
+            user=request.user,
+            author=author
         )
         if subscribe.exists():
             return Response(
