@@ -2,7 +2,8 @@ version: '3.7'
 services:
 
   frontend:
-    image: miv1910/frontend:latest
+    # image: miv1910/frontend:latest
+    build: ../frontend/
     volumes:
       - ../frontend/:/app/result_build/
 
@@ -15,7 +16,8 @@ services:
       - ./.env
 
   backend:
-    image: miv1910/backend:latest
+    # image: miv1910/backend:latest
+    build: ../backend/
     restart: always
     volumes:
       - static_value:/app/static/

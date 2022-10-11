@@ -1,5 +1,0 @@
-EMPTY = '< Тут Пусто >'
-ERRORS_KEY = 'errors'
-
-INGREDIENT_MIN_AMOUNT = 1
-COOKING_TIME_MIN_VALUE = 1

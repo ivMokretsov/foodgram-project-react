@@ -1,5 +1,5 @@
 ![foodgram-project-react Workflow Status](https://github.com/ivMokretsov/foodgram-project-react/actions/workflows/main.yml/badge.svg?branch=master&event=push)
-# Продуктовый помощник Foodgram (дополнить реадми)
+# Продуктовый помощник Foodgram
 
 Проект доступен по адресу http://51.250.66.225/
 
